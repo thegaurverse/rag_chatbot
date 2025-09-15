@@ -1,9 +1,12 @@
 {
   "build": {
-    "builder": "DOCKERFILE"
+    "builder": "DOCKERFILE",
+    "buildCommand": "docker build --platform linux/amd64 -t app ."
   },
   "deploy": {
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 3
+    "restartPolicyMaxRetries": 3,
+    "healthcheckPath": "/_stcore/health",
+    "healthcheckTimeout": 300
   }
 }

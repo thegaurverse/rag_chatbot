@@ -17,6 +17,12 @@ load_dotenv()
 # Main header with better styling
 st.markdown("# 🩺 RAG Health Q&A Chatbot")
 st.markdown("## Intelligent Health Information System powered by WHO Data")
+
+# Show loading status
+if 'app_loaded' not in st.session_state:
+    st.info("🚀 Starting up... Loading AI models and connecting to database. Please wait 10-15 seconds.")
+    st.session_state.app_loaded = True
+
 st.markdown("---")
 
 
@@ -115,7 +121,7 @@ def initialize_database():
 @st.cache_resource
 def load_embeddings():
     """Load local HuggingFace embeddings."""
-    with st.spinner("🧠 Loading local embeddings model..."):
+    with st.spinner("🧠 Loading embeddings model... (may take 10-15 seconds on first run)"):
         return HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 # Database connection check
@@ -145,8 +151,7 @@ def check_database_connection():
         return False, f"Database connection failed: {str(e)}"
 
 # Check API keys first
-if not check_api_keys():
-    st.stop()
+api_keys_available = check_api_keys()
 
 # Check database connection
 db_status, db_message = check_database_connection()
@@ -159,6 +164,19 @@ if not db_status:
     2. Set the PGVECTOR_CONNECTION_STRING environment variable
     3. Wait for the app to initialize the database automatically
     """)
+    
+    # Show demo mode instead of stopping completely
+    st.warning("🔧 Running in Demo Mode - Database features disabled")
+    st.markdown("### 💬 Demo Mode")
+    st.info("This is a demo version. To use the full RAG functionality, please configure the database connection.")
+    
+    # Simple demo UI
+    demo_query = st.text_input("Try a demo question:", placeholder="e.g., What is HALE?")
+    if demo_query:
+        st.info("🔧 Demo Mode: In full deployment, this would search WHO health data and provide detailed answers.")
+    st.stop()
+
+if not api_keys_available:
     st.stop()
 
 # Initialize database if needed

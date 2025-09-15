@@ -1,10 +1,21 @@
+# Git and version control
 .git
 .gitignore
 .vscode
+
+# Documentation
 README.md
 RAILWAY_DEPLOY.md
-.env
 *.md
+
+# Environment and config
+.env
+.env.*
+test_app.py
+build-docker.ps1
+requirements-light.txt
+
+# Python cache and build artifacts
 __pycache__
 *.pyc
 *.pyo
@@ -21,4 +32,18 @@ nosetests.xml
 coverage.xml
 *.cover
 *.log
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# IDE files
+*.swp
+*.swo
+*~
+.idea/
+*.sublime-*
+
+# Temporary files
+*.tmp
+*.temp
