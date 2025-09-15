@@ -1,0 +1,16 @@
+# Minimal requirements for testing build
+streamlit==1.39.0
+openai==1.12.0
+python-dotenv==1.0.1
+httpx>=0.24.0
+
+# Database
+pgvector==0.3.6
+psycopg2-binary==2.9.9
+
+# Basic ML (CPU-only, minimal versions)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.1.0+cpu
+transformers==4.30.0
+sentence-transformers==2.2.2
+numpy==1.24.4

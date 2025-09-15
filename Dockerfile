@@ -6,9 +6,12 @@ ARG TARGETPLATFORM=linux/amd64
 
 WORKDIR /app
 
-# Install only essential system dependencies
+# Install system dependencies needed for psycopg2, numpy, scipy
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq-dev \
+    libopenblas-dev \
     build-essential \
+    git \
     curl \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
@@ -16,12 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy requirements first for better Docker layer caching
 COPY requirements.txt .
 
-# Install Python dependencies with optimizations
-RUN pip install --no-cache-dir \
-    --timeout 600 \
-    --retries 3 \
-    --upgrade pip setuptools wheel \
-    && pip install --no-cache-dir \
+# Upgrade pip and install Python dependencies
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir \
     --timeout 600 \
     --retries 3 \
     -r requirements.txt
@@ -30,6 +30,14 @@ RUN pip install --no-cache-dir \
 FROM python:3.11-slim-bookworm AS production
 
 WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    libopenblas0 \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # Copy installed packages from base stage
 COPY --from=base /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/

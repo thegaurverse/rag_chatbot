@@ -13,7 +13,10 @@ RAILWAY_DEPLOY.md
 .env.*
 test_app.py
 build-docker.ps1
+requirements-minimal.txt
 requirements-light.txt
+Dockerfile.simple
+railway-simple.json
 
 # Python cache and build artifacts
 __pycache__
