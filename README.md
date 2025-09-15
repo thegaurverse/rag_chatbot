@@ -1,16 +1,3 @@
----
-title: RAG Health Chatbot  
-emoji: 🩺
-colorFrom: blue
-colorTo: green
-sdk: streamlit
-sdk_version: 1.39.0
-app_file: app_hf.py
-pinned: false
-license: mit
-short_description: AI-powered health Q&A system using WHO data
----
-
 # 🩺 RAG Health Q&A Chatbot
 
 An intelligent health information system powered by WHO data, using AI to provide accurate, evidence-based answers to health-related questions.
@@ -21,7 +8,7 @@ An intelligent health information system powered by WHO data, using AI to provid
 - 🧠 **AI-Powered**: Uses OpenRouter API with multiple AI models (GPT, Claude, Llama)
 - 📊 **WHO Data Based**: Built on official World Health Organization health statistics
 - 🔍 **Educational Focus**: Perfect for students, researchers, and health professionals
-- 🤗 **Hugging Face Hosted**: Fast, reliable deployment on HF Spaces
+- 🚂 **Railway Deployed**: Fast, reliable deployment on Railway platform
 
 ## 🚀 How to Use
 
@@ -50,7 +37,7 @@ To enable full AI functionality, configure:
 - **Framework**: Streamlit
 - **AI Provider**: OpenRouter (multi-model access)
 - **Models**: GPT-3.5/4, Claude 3, Llama 3
-- **Deployment**: Hugging Face Spaces
+- **Deployment**: Railway
 - **Purpose**: Educational health information
 
 ## ⚠️ Important Disclaimer
@@ -59,6 +46,6 @@ This chatbot is for **educational purposes only** and should not replace profess
 
 ## 🌍 About
 
-**Powered by WHO Data • Built with Streamlit • Enhanced with AI • Hosted on 🤗 Hugging Face**
+**Powered by WHO Data • Built with Streamlit • Enhanced with AI • Hosted on 🚂 Railway**
 
 Educational Purpose Only • Not a Substitute for Medical Advice

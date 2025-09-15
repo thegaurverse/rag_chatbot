@@ -54,11 +54,3 @@ logs/
 # Temporary files
 tmp/
 temp/
-
-# Railway specific (keeping for reference)
-Dockerfile
-Procfile
-railway.json
-start.sh
-run_app.py
-requirements_railway.txt
