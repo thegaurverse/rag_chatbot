@@ -18,26 +18,32 @@
      - **Value**: Copy from PostgreSQL service → Connect → Postgres Connection URL
 
 4. **Deploy**
-   - Railway auto-deploys from your repo
-   - First deployment takes 5-10 minutes (model downloads)
-   - Subsequent deployments are faster
+   - Railway auto-deploys using the Dockerfile
+   - First deployment takes 8-15 minutes (model downloads)
+   - Subsequent deployments are faster (5-8 minutes)
 
-## Optimizations Applied
+## RPC Error Solutions Applied
 
-✅ **Build Timeout Prevention**
-- Removed `release` command from Procfile
-- Moved database initialization to runtime
-- Added lazy model loading with caching
+✅ **Custom Dockerfile Approach**
+- Uses Python 3.11-slim base image
+- Installs system dependencies (gcc, g++)
+- Optimized pip install with timeouts and retries
+- Better layer caching for faster rebuilds
 
-✅ **Performance Improvements**
-- Models download at runtime (not build time)
-- Streamlit caching for models and embeddings
-- Session state management to prevent reloading
+✅ **Railway Configuration**
+- `railway.json` specifies Dockerfile builder
+- Restart policy for failed deployments
+- Proper port configuration
 
-✅ **Error Handling**
-- Graceful model loading failures
-- Database connection retries
-- User-friendly error messages
+✅ **Optimized Dependencies**
+- Compatible version ranges for all packages
+- Reduced numpy version conflicts
+- Streamlined requirements.txt
+
+✅ **Build Optimizations**
+- `.dockerignore` excludes unnecessary files
+- Better caching strategy
+- Headless Streamlit configuration
 
 ## Expected Behavior
 
