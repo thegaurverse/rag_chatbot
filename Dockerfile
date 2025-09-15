@@ -31,4 +31,4 @@ RUN chmod +x run_app.py
 EXPOSE 8080
 
 # Run the application using startup script
-CMD ["./start.sh"]
+CMD ["sh", "-c", "./start.sh"]
