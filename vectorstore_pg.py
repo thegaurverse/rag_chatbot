@@ -1,5 +1,5 @@
 from langchain.vectorstores.pgvector import PGVector
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 import os
 from dotenv import load_dotenv
 
@@ -7,10 +7,10 @@ load_dotenv()
 
 # ✅ Load env variables
 CONNECTION_STRING = os.getenv("PGVECTOR_CONNECTION_STRING")  # .env se le raha
-COLLECTION_NAME = "documents"
+COLLECTION_NAME = "healthdata"
 
 # ✅ Initialize embeddings
-embeddings = OpenAIEmbeddings()
+embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 # ✅ Setup PGVector
 vectorstore = PGVector(

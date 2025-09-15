@@ -7,6 +7,8 @@ from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain import HuggingFacePipeline
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
+import psycopg2
+from urllib.parse import urlparse
 
 # Load environment variables
 load_dotenv()
@@ -31,14 +33,60 @@ with st.sidebar:
 # Load embeddings
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
-# Connect to PGVector
-vectorstore = PGVector(
-    connection_string=os.getenv("PGVECTOR_CONNECTION_STRING"),
-    collection_name="healthdata",
-    embedding_function=embeddings,
-)
+# Database connection check
+def check_database_connection():
+    """Check if database is accessible and has the required data."""
+    try:
+        connection_string = os.getenv("PGVECTOR_CONNECTION_STRING")
+        if not connection_string:
+            return False, "PGVECTOR_CONNECTION_STRING environment variable not set"
+        
+        # Test basic connection
+        parsed = urlparse(connection_string)
+        conn = psycopg2.connect(connection_string)
+        cursor = conn.cursor()
+        
+        # Check if vector extension exists
+        cursor.execute("SELECT * FROM pg_extension WHERE extname = 'vector';")
+        if not cursor.fetchone():
+            return False, "PGVector extension not installed"
+        
+        # Check if our collection exists
+        cursor.execute("SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'langchain_pg_embedding');")
+        if not cursor.fetchone()[0]:
+            return False, "Vector database not initialized. Please run init_db.py first"
+        
+        cursor.close()
+        conn.close()
+        return True, "Database connection successful"
+        
+    except Exception as e:
+        return False, f"Database connection failed: {str(e)}"
 
-retriever = vectorstore.as_retriever()
+# Check database connection
+db_status, db_message = check_database_connection()
+
+if not db_status:
+    st.error(f"🚨 Database Error: {db_message}")
+    st.info("💡 If you're deploying on Railway, make sure to:")
+    st.markdown("""
+    1. Add a PostgreSQL service to your Railway project
+    2. Set the PGVECTOR_CONNECTION_STRING environment variable
+    3. Run the database initialization script
+    """)
+    st.stop()
+
+# Connect to PGVector
+try:
+    vectorstore = PGVector(
+        connection_string=os.getenv("PGVECTOR_CONNECTION_STRING"),
+        collection_name="healthdata",
+        embedding_function=embeddings,
+    )
+    retriever = vectorstore.as_retriever()
+except Exception as e:
+    st.error(f"🚨 Failed to connect to vector database: {str(e)}")
+    st.stop()
 
 # Load model
 @st.cache_resource
