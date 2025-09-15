@@ -53,8 +53,8 @@ def initialize_vector_database():
     try:
         print("📚 Loading and processing health data...")
         
-        # Import here to avoid issues if other imports fail
-        from text_loader import *
+        # Import text_loader to initialize data
+        import text_loader
         
         print("✅ Vector database initialized successfully!")
         return True
