@@ -2,15 +2,23 @@
 # Startup script for Railway deployment
 # Uses PORT environment variable or defaults to 8080
 
-port=${PORT:-8080}
-echo "Starting Streamlit on port $port..."
+# Clear any conflicting Streamlit environment variables
+unset STREAMLIT_SERVER_PORT
+
+# Set port with fallback
+if [ -z "$PORT" ]; then
+    export PORT=8080
+fi
+
+echo "Starting Streamlit on port $PORT..."
 echo "Current working directory: $(pwd)"
 echo "Python version: $(python --version)"
 echo "Streamlit version: $(streamlit --version)"
+echo "PORT environment variable: $PORT"
 
-# Start Streamlit with Railway-optimized settings
-exec streamlit run app_simple.py \
-    --server.port=$port \
+# Start Streamlit with explicit port
+exec python -m streamlit run app_simple.py \
+    --server.port=$PORT \
     --server.address=0.0.0.0 \
     --server.headless=true \
     --server.runOnSave=false \

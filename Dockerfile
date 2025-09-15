@@ -25,6 +25,7 @@ COPY . .
 
 # Make startup script executable
 RUN chmod +x start.sh
+RUN chmod +x run_app.py
 
 # Expose default port (Railway will set PORT env var at runtime)
 EXPOSE 8080
