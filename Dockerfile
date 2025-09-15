@@ -22,8 +22,8 @@ RUN pip install --no-cache-dir --timeout 600 --retries 3 -r requirements.txt
 # Copy application code
 COPY . .
 
-# Make startup script executable
-RUN chmod +x start.sh
+# Make Python launcher executable
+RUN chmod +x run_streamlit.py
 
 # Expose port (Railway will set PORT env var at runtime)
 EXPOSE 8080
@@ -32,5 +32,5 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/_stcore/health || exit 1
 
-# Run the application using startup script
-CMD ["./start.sh"]
+# Run the application using Python launcher
+CMD ["python", "run_streamlit.py"]

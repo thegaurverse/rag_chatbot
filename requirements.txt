@@ -1,4 +1,4 @@
-# Core Streamlit app for Hugging Face Spaces
+# Core Streamlit app for Railway deployment
 streamlit==1.39.0
 python-dotenv==1.0.1
 
@@ -9,7 +9,7 @@ openai==1.12.0
 httpx>=0.24.0
 
 # Optional: For future RAG functionality
-# Commenting out heavy dependencies for faster HF Spaces startup
+# Commenting out heavy dependencies for faster Railway startup
 # psycopg2-binary==2.9.9
 # pgvector==0.3.6
 # pypdf==5.1.0
