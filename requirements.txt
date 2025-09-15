@@ -1,24 +1,20 @@
-# Core dependencies with optimized versions
+# Core Streamlit app
 streamlit==1.39.0
-langchain==0.3.27
-langchain-community==0.3.21
-langchain-huggingface==0.1.2
-pgvector==0.3.6
-psycopg2-binary==2.9.9
 python-dotenv==1.0.1
-pypdf==5.1.0
 openai==1.12.0
 httpx>=0.24.0
 
-# Optimized ML dependencies with prebuilt wheels
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.2.0+cpu
-torchvision==0.17.0+cpu
-torchaudio==2.2.0+cpu
+# Database
+psycopg2-binary==2.9.9
+pgvector==0.3.6
 
-# HuggingFace with optimized versions
-transformers==4.36.0
-sentence-transformers==2.2.2
-numpy>=1.24.0,<1.27.0
-scikit-learn>=1.3.0,<1.4.0
-scipy>=1.10.0,<1.12.0
+# Text processing
+pypdf==5.1.0
+
+# LangChain (compatible versions)
+langchain-core==0.3.51
+langchain-community==0.3.21
+
+# Math libraries (compatible versions)
+numpy==1.26.4
+scikit-learn==1.3.2
