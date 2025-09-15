@@ -86,10 +86,17 @@ class OpenRouterLLM:
         self.model_name = model_name
         self.temperature = temperature
         self.max_tokens = max_tokens
-        self.client = openai.OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=api_key
-        )
+        
+        try:
+            # Initialize OpenAI client with minimal parameters to avoid compatibility issues
+            self.client = openai.OpenAI(
+                base_url="https://openrouter.ai/api/v1",
+                api_key=api_key
+            )
+            # Test the client initialization
+            _ = self.client.models.list
+        except Exception as e:
+            raise Exception(f"Failed to initialize OpenAI client: {str(e)}")
     
     def __call__(self, prompt):
         try:
@@ -149,6 +156,9 @@ def main():
     
     # Full functionality with API
     try:
+        # Add debug information
+        st.info(f"🔧 Initializing OpenRouter client with OpenAI version: {openai.__version__}")
+        
         llm = OpenRouterLLM(api_key)
         st.success("✅ AI Assistant Ready - OpenRouter API Connected")
         
