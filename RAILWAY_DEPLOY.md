@@ -1,4 +1,4 @@
-# Railway Deployment Guide
+# Railway Deployment Guide - Hybrid Model Approach
 
 ## Quick Deploy to Railway
 
@@ -10,55 +10,86 @@
    - In Railway dashboard: **+ New** → **Database** → **PostgreSQL**
    - Wait for provisioning (2-3 minutes)
 
-3. **Set Environment Variable**
+3. **Set Environment Variables**
    - Click on your **Web Service** (not database)
    - Go to **Variables** tab
-   - Add variable:
+   - Add variables:
      - **Name**: `PGVECTOR_CONNECTION_STRING`
      - **Value**: Copy from PostgreSQL service → Connect → Postgres Connection URL
+     - **Name**: `OPENROUTER_API_KEY`
+     - **Value**: Your OpenRouter API key from https://openrouter.ai/keys
 
 4. **Deploy**
    - Railway auto-deploys using the Dockerfile
-   - First deployment takes 8-15 minutes (model downloads)
-   - Subsequent deployments are faster (5-8 minutes)
+   - Build time: 8-12 minutes (embedding model download once)
+   - Subsequent deployments are faster (3-5 minutes)
 
-## RPC Error Solutions Applied
+## Hybrid Model Benefits
 
-✅ **Custom Dockerfile Approach**
-- Uses Python 3.11-slim base image
-- Installs system dependencies (gcc, g++)
-- Optimized pip install with timeouts and retries
-- Better layer caching for faster rebuilds
+✅ **Cost Optimization**
+- Local embeddings = No API costs for vector operations
+- OpenRouter API = Pay only for language generation
+- ~90% cost reduction vs full API approach
 
-✅ **Railway Configuration**
-- `railway.json` specifies Dockerfile builder
-- Restart policy for failed deployments
-- Proper port configuration
+✅ **Model Flexibility**
+- Access to multiple models: Claude, GPT, Llama, Gemma
+- Switch models without code changes
+- Free tier models available (Llama, Gemma)
 
-✅ **Optimized Dependencies**
-- Compatible version ranges for all packages
-- Reduced numpy version conflicts
-- Streamlined requirements.txt
+✅ **Performance Balance**
+- Fast local embeddings (no API latency)
+- High-quality responses from premium models
+- Moderate memory usage (~500MB)
 
-✅ **Build Optimizations**
-- `.dockerignore` excludes unnecessary files
-- Better caching strategy
-- Headless Streamlit configuration
+✅ **Deployment Stability**
+- Only sentence-transformers download needed
+- Much smaller than full LLM (300MB vs 1GB+)
+- Reliable builds with reduced timeout risk
 
-## Expected Behavior
+## Available Models
 
-1. **First Run**: May take 2-3 minutes to load models
-2. **Subsequent Runs**: Fast response (~2-5 seconds)
-3. **Memory Usage**: ~1.8GB (well within Railway's 8GB limit)
+### Free Models (Default: gpt-oss-120b)
+- `openai/gpt-oss-120b:free` ⭐ **DEFAULT** - Large 120B parameter model
+- `meta-llama/llama-3.1-8b-instruct:free`
+- `google/gemma-2-9b-it:free`
+
+### Premium Models
+- `anthropic/claude-3-haiku` (~$0.25/1M tokens)
+- `openai/gpt-3.5-turbo` (~$0.50/1M tokens)
+- `microsoft/wizardlm-2-8x22b` (~$1.00/1M tokens)
+
+## Environment Variables Required
+
+```bash
+PGVECTOR_CONNECTION_STRING=postgresql://username:password@host:port/database
+OPENROUTER_API_KEY=sk-or-your-openrouter-api-key-here
+```
+
+## Expected Costs
+
+- **Embeddings**: FREE (local model)
+- **Language Model**: $0.001-0.01 per question (varies by model)
+- **Railway**: Free tier covers most usage
+- **PostgreSQL**: Included in Railway
+
+## Architecture Benefits
+
+- **Embeddings**: Local HuggingFace model (fast, free, offline)
+- **Language Model**: OpenRouter API (flexible, high-quality)
+- **Vector Store**: PostgreSQL with PGVector
+- **Memory Usage**: ~500MB (balanced approach)
+- **Build Time**: 8-12 minutes first time, 3-5 minutes subsequent
+
+## Model Selection
+
+The app includes a model selector in the sidebar:
+- Choose based on your needs (speed vs quality vs cost)
+- Free models for development/testing
+- Premium models for production
 
 ## Troubleshooting
 
-- **Build timeout**: Models now load at runtime, not build time
-- **Memory issues**: App uses ~1.8GB RAM, suitable for Railway
-- **Database errors**: Check connection string format
-- **Slow first response**: Normal - models are downloading
-
-## Test Questions
-- "What is HALE?"
-- "What are the main health indicators?"
-- "How is life expectancy calculated?"
+- **API Key Error**: Ensure OPENROUTER_API_KEY is set correctly
+- **Model Access**: Some models may require OpenRouter credits
+- **Embedding Load**: First run downloads ~300MB model
+- **Database**: Check PGVECTOR_CONNECTION_STRING format

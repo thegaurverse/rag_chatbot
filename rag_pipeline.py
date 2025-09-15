@@ -2,11 +2,9 @@ from langchain_community.vectorstores.pgvector import PGVector
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-from langchain import HuggingFacePipeline
-
-from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 from dotenv import load_dotenv
 import os
+import openai
 
 # Load .env
 load_dotenv()
@@ -26,24 +24,41 @@ vectorstore = PGVector(
 
 retriever = vectorstore.as_retriever()
 
-# Load local model
-model_id = "google/flan-t5-base"
-tokenizer = AutoTokenizer.from_pretrained(model_id)
-model = AutoModelForSeq2SeqLM.from_pretrained(model_id)
+# Custom OpenRouter LLM class
+class OpenRouterLLM:
+    def __init__(self, model_name="openai/gpt-3.5-turbo", temperature=0.1, max_tokens=500):
+        self.model_name = model_name
+        self.temperature = temperature
+        self.max_tokens = max_tokens
+        self.client = openai.OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPENROUTER_API_KEY")
+        )
+    
+    def __call__(self, prompt):
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=self.temperature,
+                max_tokens=self.max_tokens
+            )
+            return response.choices[0].message.content
+        except Exception as e:
+            return f"Error: {str(e)}"
 
-# Create pipeline
-pipe = pipeline("text2text-generation", model=model, tokenizer=tokenizer, max_length=512)
-
-# Wrap it for LangChain
-llm = HuggingFacePipeline(pipeline=pipe)
+# Initialize OpenRouter LLM
+llm = OpenRouterLLM()
 
 # Prompt Template
 prompt_template = """
-Use the following context to answer the question.
+Use the following context to answer the question about health topics.
 
 Context: {context}
 
 Question: {question}
+
+Please provide a clear, accurate answer based on the provided context. If the context doesn't contain enough information to answer the question, say so.
 """
 
 prompt = PromptTemplate(
@@ -51,17 +66,23 @@ prompt = PromptTemplate(
     input_variables=["context", "question"]
 )
 
-# Create the RetrievalQA chain
-qa_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    retriever=retriever,
-    chain_type="stuff",
-    chain_type_kwargs={"prompt": prompt},
-    return_source_documents=False
-)
+# Custom QA function for OpenRouter
+def run_qa_chain(query):
+    """Run the QA chain with OpenRouter LLM."""
+    # Get relevant documents
+    docs = retriever.get_relevant_documents(query)
+    context = "\n\n".join([doc.page_content for doc in docs])
+    
+    # Format prompt
+    formatted_prompt = prompt.format(context=context, question=query)
+    
+    # Get response from OpenRouter
+    response = llm(formatted_prompt)
+    return response
 
-# Ask a question
-query = input("Ask your health-related question: ")
-result = qa_chain.run(query)
-
-print(f"\nAnswer : {result}")
+# Example usage
+if __name__ == "__main__":
+    # Ask a question
+    query = input("Ask your health-related question: ")
+    result = run_qa_chain(query)
+    print(f"\nAnswer: {result}")

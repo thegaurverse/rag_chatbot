@@ -16,7 +16,7 @@ documents = loader.load()
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 texts = text_splitter.split_documents(documents)
 
-# Create embeddings using Hugging Face (no API key needed)
+# Create embeddings using local HuggingFace model (no API key needed)
 embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 # Store embeddings in PostgreSQL using PGVector
@@ -26,5 +26,3 @@ PGVector.from_documents(
     collection_name="healthdata",
     connection_string=os.getenv("PGVECTOR_CONNECTION_STRING"),
 )
-
-
