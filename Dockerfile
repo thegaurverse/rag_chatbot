@@ -23,8 +23,11 @@ RUN pip install --no-cache-dir --timeout 600 --retries 3 -r requirements.txt
 # Copy application code
 COPY . .
 
-# Expose port
+# Make startup script executable
+RUN chmod +x start.sh
+
+# Expose default port (Railway will set PORT env var at runtime)
 EXPOSE 8080
 
-# Run the application
-CMD ["streamlit", "run", "app.py", "--server.port=8080", "--server.address=0.0.0.0", "--server.headless=true"]
+# Run the application using startup script
+CMD ["./start.sh"]

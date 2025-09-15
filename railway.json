@@ -1,7 +1,6 @@
 {
   "build": {
-    "builder": "DOCKERFILE",
-    "buildCommand": "docker build --platform linux/amd64 -t app ."
+    "builder": "DOCKERFILE"
   },
   "deploy": {
     "restartPolicyType": "ON_FAILURE",
